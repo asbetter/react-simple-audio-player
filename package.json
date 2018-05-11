@@ -1,0 +1,24 @@
+{
+  "name": "react-simple-audio-player",
+  "version": "1.0.0",
+  "description": "React component for playing audio files.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asbetter/react-simple-audio-player.git"
+  },
+  "keywords": [
+    "react",
+    "audio",
+    "player"
+  ],
+  "author": "annavane",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asbetter/react-simple-audio-player/issues"
+  },
+  "homepage": "https://github.com/asbetter/react-simple-audio-player#readme"
+}
