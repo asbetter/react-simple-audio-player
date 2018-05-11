@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import ReactPlayer from 'react-player';
-
-var moment = require("moment");
-var momentDurationFormatSetup = require("moment-duration-format");
-
+import moment from 'moment';
+import momentDurationFormatSetup from 'moment-duration-format';
 
 const opts = {
     cx: 30,
@@ -83,17 +81,17 @@ class PlayImage extends Component {
             <svg x={position.x} y={position.y} width={width} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}  xmlns="http://www.w3.org/2000/svg" >
                 <g >
                     <circle r={opts.radius} id="svg_1" cy={opts.radius} cx={opts.radius} fill={colors[0]}/>
-                    <polygon style={{display:this.state.playing?'none':true}} points={((size)=>{
-                        var cord1 = this.polarToCartesian(size, size, size, 90);
-                        var cord2 = this.polarToCartesian(size, size, size, 210);
-                        var cord3 = this.polarToCartesian(size, size, size, 330);
+                    <polygon style={{display:this.state.playing?'none':true}} points={((x, y, size)=>{
+                        var cord1 = this.polarToCartesian(x, y, size, 90);
+                        var cord2 = this.polarToCartesian(x, y, size, 210);
+                        var cord3 = this.polarToCartesian(x, y, size, 330);
 
                         return [
-                            cord1.x+size/2,cord1.y+size/2,
-                            cord2.x+size/2,cord2.y+size/2,
-                            cord3.x+size/2,cord3.y+size/2
+                            cord1.x,cord1.y,
+                            cord2.x,cord2.y,
+                            cord3.x,cord3.y
                     ].join(" ");
-                    })(18)} fill={colors[1]} />
+                    })(opts.radius, opts.radius, 18)} fill={colors[1]} />
                 </g>
             </svg>);
     }
@@ -103,8 +101,8 @@ class PlayImage extends Component {
             <svg x={position.x} y={position.y} width={width} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}  xmlns="http://www.w3.org/2000/svg" >
                 <g >
                     <circle r={opts.radius} id="svg_1" cy={opts.radius} cx={opts.radius} fill={colors[0]}/>
-                    {this.getRectangle(20,15,7,30, colors[1])}
-                    {this.getRectangle(35,15,7,30, colors[1])}
+                    {this.getRectangle(19,15,7,30, colors[1])}
+                    {this.getRectangle(34,15,7,30, colors[1])}
                 </g>
             </svg>);
     }
@@ -153,6 +151,7 @@ class PlayImage extends Component {
                     }
                 </svg>
                 <ReactPlayer
+					style={{display:"none"}}
                     progressInterval={1000}
                     onProgress={this.handleOnProgress}
                     url={this.props.url}
