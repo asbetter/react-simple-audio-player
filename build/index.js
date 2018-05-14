@@ -18739,7 +18739,7 @@ var opts = {
     start_angle: 0
 };
 
-var colorScale = ['#980000', '#fa0000', '#ffacac', '#fffafa'];
+var colorScale = ['#980000', '#fa0000', '#ffacac', '#ffe1e1', '#ffffff'];
 
 var initProgress = {
     loaded: 0,
@@ -18750,13 +18750,13 @@ var initProgress = {
 
 var progrssWidth = 0.3;
 
-var PlayImage = function (_Component) {
-    _inherits(PlayImage, _Component);
+var PlayAudio = function (_Component) {
+    _inherits(PlayAudio, _Component);
 
-    function PlayImage(props) {
-        _classCallCheck(this, PlayImage);
+    function PlayAudio(props) {
+        _classCallCheck(this, PlayAudio);
 
-        var _this = _possibleConstructorReturn(this, (PlayImage.__proto__ || Object.getPrototypeOf(PlayImage)).call(this, props));
+        var _this = _possibleConstructorReturn(this, (PlayAudio.__proto__ || Object.getPrototypeOf(PlayAudio)).call(this, props));
 
         _this.state = {
             start: _this.polarToCartesian(opts.cx, opts.cy, opts.radius, 0),
@@ -18764,18 +18764,20 @@ var PlayImage = function (_Component) {
             largeArcFlag: 0,
             playing: false,
             duration: 0,
-            progress: initProgress
+            started: false,
+            progress: initProgress,
+            simpleMode: _this.props.simpleMode ? _this.props.simpleMode : _this.props.width < 45 ? true : false,
+            width: _this.props.width ? _this.props.width : 60
         };
 
         _this.handleClick = _this.handleClick.bind(_this);
         _this.handleOnProgress = _this.handleOnProgress.bind(_this);
         _this.handleOnDuration = _this.handleOnDuration.bind(_this);
         _this.handleOnEnded = _this.handleOnEnded.bind(_this);
-
         return _this;
     }
 
-    _createClass(PlayImage, [{
+    _createClass(PlayAudio, [{
         key: 'handleOnDuration',
         value: function handleOnDuration(data) {
             this.setState({ duration: data });
@@ -18785,19 +18787,22 @@ var PlayImage = function (_Component) {
         value: function handleOnProgress(data) {
             var newStart = this.polarToCartesian(opts.cx, opts.cy, opts.radius, data.played * 360);
             var newLargeArcFlag = data.played * 360 - opts.start_angle <= 180 ? "0" : "1";
-            this.setState({ progress: data, start: newStart, largeArcFlag: newLargeArcFlag });
+
+            this.setState(function (prevState, props) {
+                if (prevState.progress.played < data.played && prevState.started == true) return { progress: data, start: newStart, largeArcFlag: newLargeArcFlag };
+            });
         }
     }, {
         key: 'handleClick',
         value: function handleClick() {
             var playing = this.state.playing;
-            this.setState({ playing: !playing });
+            this.setState({ playing: !playing, started: true });
         }
     }, {
         key: 'handleOnEnded',
         value: function handleOnEnded() {
             var newStart = this.polarToCartesian(opts.cx, opts.cy, opts.radius, 0);
-            this.setState({ progress: initProgress, start: newStart, largeArcFlag: 0, playing: false });
+            this.setState({ progress: initProgress, start: newStart, largeArcFlag: 0, playing: false, started: false });
         }
     }, {
         key: 'polarToCartesian',
@@ -18820,7 +18825,6 @@ var PlayImage = function (_Component) {
                 _react2.default.createElement(
                     'g',
                     null,
-                    _react2.default.createElement('circle', { r: opts.radius, id: 'svg_1', cy: opts.radius, cx: opts.radius, fill: colors[0] }),
                     _react2.default.createElement('polygon', { style: { display: this.state.playing ? 'none' : true }, points: function (x, y, size) {
                             var cord1 = _this2.polarToCartesian(x, y, size, 90);
                             var cord2 = _this2.polarToCartesian(x, y, size, 210);
@@ -18840,7 +18844,6 @@ var PlayImage = function (_Component) {
                 _react2.default.createElement(
                     'g',
                     null,
-                    _react2.default.createElement('circle', { r: opts.radius, id: 'svg_1', cy: opts.radius, cx: opts.radius, fill: colors[0] }),
                     this.getRectangle(19, 15, 7, 30, colors[1]),
                     this.getRectangle(34, 15, 7, 30, colors[1])
                 )
@@ -18860,13 +18863,12 @@ var PlayImage = function (_Component) {
                 _react2.default.createElement(
                     'g',
                     null,
-                    _react2.default.createElement('circle', { r: opts.radius, id: 'svg_1', cy: opts.radius, cx: opts.radius, fill: colors[0] }),
                     _react2.default.createElement(
                         'text',
                         { style: { display: this.state.playing ? true : 'none' }, y: opts.radius + 4, transform: 'translate(30)' },
                         _react2.default.createElement(
                             'tspan',
-                            { fill: colorScale[0], style: { fontSize: "9pt", fontFamily: "Verdana" }, x: '0', textAnchor: 'middle' },
+                            { fill: colorScale[0], style: { fontSize: "12pt", fontFamily: "Verdana" }, x: '0', textAnchor: 'middle' },
                             _moment2.default.duration(this.state.progress.playedSeconds, "seconds").format("mm:ss", { trim: false })
                         )
                     )
@@ -18876,21 +18878,29 @@ var PlayImage = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
+            var _this3 = this;
+
             return _react2.default.createElement(
                 'div',
                 null,
                 _react2.default.createElement(
                     'svg',
-                    { onClick: this.handleClick, width: this.props.width, height: this.props.width, style: { textAlign: "center", verticalAlign: "center" }, viewBox: "0 0 " + opts.radius * 2 + " " + opts.radius * 2,
+                    { onClick: this.handleClick, width: this.state.width, height: this.state.width, style: { textAlign: "center", verticalAlign: "center", cursor: this.state.playing ? "progress" : "pointer" }, viewBox: "0 0 " + opts.radius * 2 + " " + opts.radius * 2,
                         xmlns: 'http://www.w3.org/2000/svg' },
                     _react2.default.createElement(
                         'g',
                         null,
                         _react2.default.createElement('circle', { r: opts.radius, id: 'svg_1', cy: opts.radius, cx: opts.radius, fill: colorScale[1] }),
                         _react2.default.createElement('path', { fill: colorScale[0], d: ["M", this.state.start.x, this.state.start.y, "A", opts.radius, opts.radius, 0, this.state.largeArcFlag, 0, this.state.end.x, this.state.end.y, "L", opts.cx, opts.cy, "Z"].join(" ") }),
-                        _react2.default.createElement('circle', { r: opts.radius * (1 - progrssWidth), id: 'svg_2', cy: opts.radius, cx: opts.radius, fill: colorScale[3] })
-                    ),
-                    this.state.playing ? this.props.simpleMode ? this.getPauseSection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4, [colorScale[2], colorScale[0]]) : this.getProgressSection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4, [colorScale[2], colorScale[0]]) : this.getPlaySection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4, [colorScale[2], colorScale[0]])
+                        _react2.default.createElement('circle', { r: opts.radius * (1 - progrssWidth), id: 'svg_2', cy: opts.radius, cx: opts.radius, fill: colorScale[4] }),
+                        _react2.default.createElement('circle', { r: opts.radius * (1 - progrssWidth) - 2, id: 'svg_3', cy: opts.radius, cx: opts.radius, fill: colorScale[3] }),
+                        _react2.default.createElement('path', { d: function (x, y, size) {
+                                var startCord = _this3.polarToCartesian(x, y, size, 90);
+                                var endCord = _this3.polarToCartesian(x, y, size, 270);
+                                return ["M", startCord.x, startCord.y, "A", size, size, 0, _this3.state.largeArcFlag, 0, endCord.x, endCord.y, "L", x, y, "Z"].join(" ");
+                            }(opts.radius, opts.radius, opts.radius * (1 - progrssWidth) - 2), fill: '#ffc7c7' }),
+                        this.state.playing ? this.state.simpleMode ? this.getPauseSection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4, [colorScale[2], colorScale[0]]) : this.getProgressSection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4, [colorScale[2], colorScale[0]]) : this.getPlaySection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4, [colorScale[2], colorScale[0]])
+                    )
                 ),
                 _react2.default.createElement(_reactPlayer2.default, {
                     style: { display: "none" },
@@ -18905,10 +18915,10 @@ var PlayImage = function (_Component) {
         }
     }]);
 
-    return PlayImage;
+    return PlayAudio;
 }(_react.Component);
 
-exports.default = PlayImage;
+exports.default = PlayAudio;
 
 /***/ }),
 /* 140 */

@@ -15,7 +15,8 @@ const colorScale =
         '#980000',
         '#fa0000',
         '#ffacac',
-        '#fffafa',
+        '#ffe1e1',
+        '#ffffff',
     ];
 
 const initProgress = {
@@ -27,7 +28,7 @@ const initProgress = {
 
 const progrssWidth = 0.3;
 
-class PlayImage extends Component {
+class PlayAudio extends Component {
     constructor(props) {
         super(props);
 
@@ -37,14 +38,16 @@ class PlayImage extends Component {
             largeArcFlag: 0,
             playing: false,
             duration: 0,
-            progress: initProgress
+            started: false,
+            progress: initProgress,
+            simpleMode: this.props.simpleMode?this.props.simpleMode:this.props.width<45?true:false,
+            width: this.props.width?this.props.width:60,
         };
 
         this.handleClick = this.handleClick.bind(this);
         this.handleOnProgress = this.handleOnProgress.bind(this);
         this.handleOnDuration = this.handleOnDuration.bind(this);
         this.handleOnEnded = this.handleOnEnded.bind(this);
-
     }
 
     handleOnDuration(data){
@@ -54,17 +57,21 @@ class PlayImage extends Component {
     handleOnProgress(data){
         var newStart = this.polarToCartesian(opts.cx, opts.cy, opts.radius, data.played*360);
         var newLargeArcFlag = data.played*360 - opts.start_angle <= 180 ? "0" : "1";
-        this.setState({progress:data, start:newStart, largeArcFlag:newLargeArcFlag})
+
+        this.setState((prevState,props)=>{
+            if(prevState.progress.played < data.played && prevState.started == true)
+                return {progress:data, start:newStart, largeArcFlag:newLargeArcFlag};
+        });
     }
 
     handleClick(){
         var playing = this.state.playing;
-        this.setState({ playing: !playing })
+        this.setState({ playing: !playing, started: true })
     }
 
     handleOnEnded(){
         var newStart = this.polarToCartesian(opts.cx, opts.cy, opts.radius, 0);
-        this.setState({progress:initProgress, start:newStart, largeArcFlag:0, playing: false})
+        this.setState({progress:initProgress, start:newStart, largeArcFlag:0, playing: false, started: false })
     }
 
     polarToCartesian(centerX, centerY, radius, angleInDegrees) {
@@ -80,7 +87,6 @@ class PlayImage extends Component {
         return(
             <svg x={position.x} y={position.y} width={width} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}  xmlns="http://www.w3.org/2000/svg" >
                 <g >
-                    <circle r={opts.radius} id="svg_1" cy={opts.radius} cx={opts.radius} fill={colors[0]}/>
                     <polygon style={{display:this.state.playing?'none':true}} points={((x, y, size)=>{
                         var cord1 = this.polarToCartesian(x, y, size, 90);
                         var cord2 = this.polarToCartesian(x, y, size, 210);
@@ -100,7 +106,6 @@ class PlayImage extends Component {
         return(
             <svg x={position.x} y={position.y} width={width} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}  xmlns="http://www.w3.org/2000/svg" >
                 <g >
-                    <circle r={opts.radius} id="svg_1" cy={opts.radius} cx={opts.radius} fill={colors[0]}/>
                     {this.getRectangle(19,15,7,30, colors[1])}
                     {this.getRectangle(34,15,7,30, colors[1])}
                 </g>
@@ -120,9 +125,8 @@ class PlayImage extends Component {
         return(
             <svg x={position.x} y={position.y} width={width} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}  xmlns="http://www.w3.org/2000/svg" >
                 <g >
-                    <circle r={opts.radius} id="svg_1" cy={opts.radius} cx={opts.radius} fill={colors[0]}/>
                     <text style={{display:this.state.playing?true:'none' }} y={opts.radius + 4} transform="translate(30)">
-                        <tspan fill={colorScale[0]} style={{fontSize:"9pt", fontFamily:"Verdana"}} x="0" textAnchor="middle">{moment.duration(this.state.progress.playedSeconds, "seconds").format("mm:ss", {trim: false})}</tspan>
+                        <tspan fill={colorScale[0]} style={{fontSize:"12pt", fontFamily:"Verdana"}} x="0" textAnchor="middle">{moment.duration(this.state.progress.playedSeconds, "seconds").format("mm:ss", {trim: false})}</tspan>
                     </text>
                 </g>
             </svg>);
@@ -130,7 +134,7 @@ class PlayImage extends Component {
 
     render() {
         return (<div>
-                <svg onClick={this.handleClick} width={this.props.width} height={this.props.width} style={{textAlign:"center", verticalAlign:"center"}} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}
+                <svg onClick={this.handleClick} width={this.state.width} height={this.state.width} style={{textAlign:"center", verticalAlign:"center", cursor:this.state.playing?"progress":"pointer"}} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}
                 xmlns="http://www.w3.org/2000/svg" >
                     <g>
                         <circle r={opts.radius} id="svg_1" cy={opts.radius} cx={opts.radius} fill={colorScale[1]}/>
@@ -141,14 +145,25 @@ class PlayImage extends Component {
                                                 "Z"
                                             ].join(" ")}>
                         </path>
-                        <circle r={opts.radius*(1-progrssWidth)} id="svg_2" cy={opts.radius} cx={opts.radius} fill={colorScale[3]}/>
+                        <circle r={opts.radius*(1-progrssWidth)} id="svg_2" cy={opts.radius} cx={opts.radius} fill={colorScale[4]}/>
+                        <circle r={opts.radius*(1-progrssWidth)-2} id="svg_3" cy={opts.radius} cx={opts.radius} fill={colorScale[3]}/>
+                        <path d={((x, y, size)=>{
+                            var startCord = this.polarToCartesian(x, y, size, 90);
+                            var endCord = this.polarToCartesian(x, y, size, 270);
+                            return [
+                                "M", startCord.x, startCord.y,
+                                "A", size, size, 0, this.state.largeArcFlag, 0, endCord.x, endCord.y,
+                                "L", x, y,
+                                "Z"
+                            ].join(" ");
+                        })(opts.radius, opts.radius, opts.radius*(1-progrssWidth)-2)} fill={'#ffc7c7'} />
+                        {this.state.playing
+                            ?this.state.simpleMode
+                                ?this.getPauseSection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4, [colorScale[2],colorScale[0]])
+                                :this.getProgressSection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4, [colorScale[2],colorScale[0]])
+                            :this.getPlaySection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4, [colorScale[2],colorScale[0]])
+                        }
                     </g>
-                    {this.state.playing
-                        ?this.props.simpleMode
-                            ?this.getPauseSection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4, [colorScale[2],colorScale[0]])
-                            :this.getProgressSection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4, [colorScale[2],colorScale[0]])
-                        :this.getPlaySection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4, [colorScale[2],colorScale[0]])
-                    }
                 </svg>
                 <ReactPlayer
 					style={{display:"none"}}
@@ -164,4 +179,4 @@ class PlayImage extends Component {
     }
 }
 
-export default PlayImage
+export default PlayAudio
