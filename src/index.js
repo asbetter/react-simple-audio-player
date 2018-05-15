@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import ReactPlayer from 'react-player';
-import moment from 'moment';
-import momentDurationFormatSetup from 'moment-duration-format';
 
 const opts = {
     cx: 30,
@@ -126,10 +124,18 @@ class PlayAudio extends Component {
             <svg x={position.x} y={position.y} width={width} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}  xmlns="http://www.w3.org/2000/svg" >
                 <g >
                     <text style={{display:this.state.playing?true:'none' }} y={opts.radius + 4} transform="translate(30)">
-                        <tspan fill={colorScale[0]} style={{fontSize:"12pt", fontFamily:"Verdana"}} x="0" textAnchor="middle">{moment.duration(this.state.progress.playedSeconds, "seconds").format("mm:ss", {trim: false})}</tspan>
+                        <tspan fill={colorScale[0]} style={{fontSize:"12pt", fontFamily:"Verdana"}} x="0" textAnchor="middle">{this.formatTime(this.state.progress.playedSeconds)}</tspan>
                     </text>
                 </g>
             </svg>);
+    }
+
+    formatTime (timeInSeconds){
+        var m = Math.floor(timeInSeconds/60);
+        var s = Math.floor(timeInSeconds%60);
+        m = m < 10 ? '0' + m : m;
+        s = s < 10 ? '0' + s : s;
+        return m + ':' + s;
     }
 
     render() {
