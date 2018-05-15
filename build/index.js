@@ -2569,8 +2569,6 @@ var opts = {
     start_angle: 0
 };
 
-var colorScale = ['#980000', '#fa0000', '#ffacac', '#ffe1e1', '#ffffff'];
-
 var initProgress = {
     loaded: 0,
     loadedSeconds: 0,
@@ -2604,6 +2602,8 @@ var PlayAudio = function (_Component) {
         _this.handleOnProgress = _this.handleOnProgress.bind(_this);
         _this.handleOnDuration = _this.handleOnDuration.bind(_this);
         _this.handleOnEnded = _this.handleOnEnded.bind(_this);
+
+        _this.colorScale = _this.props.colorScale ? _this.props.colorScale : ['#980000', '#fa0000', '#ffc7c7', '#ffe1e1', '#ffffff'];
         return _this;
     }
 
@@ -2646,7 +2646,7 @@ var PlayAudio = function (_Component) {
         }
     }, {
         key: 'getPlaySection',
-        value: function getPlaySection(position, width, colors) {
+        value: function getPlaySection(position, width) {
             var _this2 = this;
 
             return _react2.default.createElement(
@@ -2661,21 +2661,21 @@ var PlayAudio = function (_Component) {
                             var cord3 = _this2.polarToCartesian(x, y, size, 330);
 
                             return [cord1.x, cord1.y, cord2.x, cord2.y, cord3.x, cord3.y].join(" ");
-                        }(opts.radius, opts.radius, 18), fill: colors[1] })
+                        }(opts.radius, opts.radius, 18), fill: this.colorScale[0] })
                 )
             );
         }
     }, {
         key: 'getPauseSection',
-        value: function getPauseSection(position, width, colors) {
+        value: function getPauseSection(position, width) {
             return _react2.default.createElement(
                 'svg',
                 { x: position.x, y: position.y, width: width, viewBox: "0 0 " + opts.radius * 2 + " " + opts.radius * 2, xmlns: 'http://www.w3.org/2000/svg' },
                 _react2.default.createElement(
                     'g',
                     null,
-                    this.getRectangle(19, 15, 7, 30, colors[1]),
-                    this.getRectangle(34, 15, 7, 30, colors[1])
+                    this.getRectangle(19, 15, 7, 30, this.colorScale[0]),
+                    this.getRectangle(34, 15, 7, 30, this.colorScale[0])
                 )
             );
         }
@@ -2686,7 +2686,7 @@ var PlayAudio = function (_Component) {
         }
     }, {
         key: 'getProgressSection',
-        value: function getProgressSection(position, width, colors) {
+        value: function getProgressSection(position, width) {
             return _react2.default.createElement(
                 'svg',
                 { x: position.x, y: position.y, width: width, viewBox: "0 0 " + opts.radius * 2 + " " + opts.radius * 2, xmlns: 'http://www.w3.org/2000/svg' },
@@ -2698,7 +2698,7 @@ var PlayAudio = function (_Component) {
                         { style: { display: this.state.playing ? true : 'none' }, y: opts.radius + 4, transform: 'translate(30)' },
                         _react2.default.createElement(
                             'tspan',
-                            { fill: colorScale[0], style: { fontSize: "12pt", fontFamily: "Verdana" }, x: '0', textAnchor: 'middle' },
+                            { fill: this.colorScale[0], style: { fontSize: "12pt", fontFamily: "Verdana" }, x: '0', textAnchor: 'middle' },
                             this.formatTime(this.state.progress.playedSeconds)
                         )
                     )
@@ -2729,16 +2729,16 @@ var PlayAudio = function (_Component) {
                     _react2.default.createElement(
                         'g',
                         null,
-                        _react2.default.createElement('circle', { r: opts.radius, id: 'svg_1', cy: opts.radius, cx: opts.radius, fill: colorScale[1] }),
-                        _react2.default.createElement('path', { fill: colorScale[0], d: ["M", this.state.start.x, this.state.start.y, "A", opts.radius, opts.radius, 0, this.state.largeArcFlag, 0, this.state.end.x, this.state.end.y, "L", opts.cx, opts.cy, "Z"].join(" ") }),
-                        _react2.default.createElement('circle', { r: opts.radius * (1 - progrssWidth), id: 'svg_2', cy: opts.radius, cx: opts.radius, fill: colorScale[4] }),
-                        _react2.default.createElement('circle', { r: opts.radius * (1 - progrssWidth) - 2, id: 'svg_3', cy: opts.radius, cx: opts.radius, fill: colorScale[3] }),
+                        _react2.default.createElement('circle', { r: opts.radius, id: 'svg_1', cy: opts.radius, cx: opts.radius, fill: this.colorScale[1] }),
+                        _react2.default.createElement('path', { fill: this.colorScale[0], d: ["M", this.state.start.x, this.state.start.y, "A", opts.radius, opts.radius, 0, this.state.largeArcFlag, 0, this.state.end.x, this.state.end.y, "L", opts.cx, opts.cy, "Z"].join(" ") }),
+                        _react2.default.createElement('circle', { r: opts.radius * (1 - progrssWidth), id: 'svg_2', cy: opts.radius, cx: opts.radius, fill: this.colorScale[4] }),
+                        _react2.default.createElement('circle', { r: opts.radius * (1 - progrssWidth) - 2, id: 'svg_3', cy: opts.radius, cx: opts.radius, fill: this.colorScale[3] }),
                         _react2.default.createElement('path', { d: function (x, y, size) {
                                 var startCord = _this3.polarToCartesian(x, y, size, 90);
                                 var endCord = _this3.polarToCartesian(x, y, size, 270);
                                 return ["M", startCord.x, startCord.y, "A", size, size, 0, _this3.state.largeArcFlag, 0, endCord.x, endCord.y, "L", x, y, "Z"].join(" ");
-                            }(opts.radius, opts.radius, opts.radius * (1 - progrssWidth) - 2), fill: '#ffc7c7' }),
-                        this.state.playing ? this.state.simpleMode ? this.getPauseSection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4, [colorScale[2], colorScale[0]]) : this.getProgressSection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4, [colorScale[2], colorScale[0]]) : this.getPlaySection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4, [colorScale[2], colorScale[0]])
+                            }(opts.radius, opts.radius, opts.radius * (1 - progrssWidth) - 2), fill: this.colorScale[2] }),
+                        this.state.playing ? this.state.simpleMode ? this.getPauseSection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4) : this.getProgressSection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4) : this.getPlaySection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4)
                     )
                 ),
                 _react2.default.createElement(_reactPlayer2.default, {

@@ -8,15 +8,6 @@ const opts = {
     start_angle: 0,
 };
 
-const colorScale =
-    [
-        '#980000',
-        '#fa0000',
-        '#ffacac',
-        '#ffe1e1',
-        '#ffffff',
-    ];
-
 const initProgress = {
     loaded:0,
     loadedSeconds:0,
@@ -46,6 +37,15 @@ class PlayAudio extends Component {
         this.handleOnProgress = this.handleOnProgress.bind(this);
         this.handleOnDuration = this.handleOnDuration.bind(this);
         this.handleOnEnded = this.handleOnEnded.bind(this);
+
+        this.colorScale = this.props.colorScale?this.props.colorScale
+            :[
+                '#980000',
+                '#fa0000',
+                '#ffc7c7',
+                '#ffe1e1',
+                '#ffffff',
+            ];
     }
 
     handleOnDuration(data){
@@ -81,7 +81,7 @@ class PlayAudio extends Component {
         };
     }
 
-    getPlaySection(position, width, colors){
+    getPlaySection(position, width){
         return(
             <svg x={position.x} y={position.y} width={width} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}  xmlns="http://www.w3.org/2000/svg" >
                 <g >
@@ -95,17 +95,17 @@ class PlayAudio extends Component {
                             cord2.x,cord2.y,
                             cord3.x,cord3.y
                     ].join(" ");
-                    })(opts.radius, opts.radius, 18)} fill={colors[1]} />
+                    })(opts.radius, opts.radius, 18)} fill={this.colorScale[0]} />
                 </g>
             </svg>);
     }
 
-    getPauseSection(position, width, colors){
+    getPauseSection(position, width){
         return(
             <svg x={position.x} y={position.y} width={width} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}  xmlns="http://www.w3.org/2000/svg" >
                 <g >
-                    {this.getRectangle(19,15,7,30, colors[1])}
-                    {this.getRectangle(34,15,7,30, colors[1])}
+                    {this.getRectangle(19,15,7,30, this.colorScale[0])}
+                    {this.getRectangle(34,15,7,30, this.colorScale[0])}
                 </g>
             </svg>);
     }
@@ -119,12 +119,12 @@ class PlayAudio extends Component {
         ].join(" ")} fill={color} />;
     }
 
-    getProgressSection(position, width, colors){
+    getProgressSection(position, width){
         return(
             <svg x={position.x} y={position.y} width={width} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}  xmlns="http://www.w3.org/2000/svg" >
                 <g >
                     <text style={{display:this.state.playing?true:'none' }} y={opts.radius + 4} transform="translate(30)">
-                        <tspan fill={colorScale[0]} style={{fontSize:"12pt", fontFamily:"Verdana"}} x="0" textAnchor="middle">{this.formatTime(this.state.progress.playedSeconds)}</tspan>
+                        <tspan fill={this.colorScale[0]} style={{fontSize:"12pt", fontFamily:"Verdana"}} x="0" textAnchor="middle">{this.formatTime(this.state.progress.playedSeconds)}</tspan>
                     </text>
                 </g>
             </svg>);
@@ -143,16 +143,16 @@ class PlayAudio extends Component {
                 <svg onClick={this.handleClick} width={this.state.width} height={this.state.width} style={{textAlign:"center", verticalAlign:"center", cursor:this.state.playing?"progress":"pointer"}} viewBox={"0 0 " + opts.radius*2 +" " + opts.radius*2}
                 xmlns="http://www.w3.org/2000/svg" >
                     <g>
-                        <circle r={opts.radius} id="svg_1" cy={opts.radius} cx={opts.radius} fill={colorScale[1]}/>
-                        <path fill={colorScale[0]} d={[
+                        <circle r={opts.radius} id="svg_1" cy={opts.radius} cx={opts.radius} fill={this.colorScale[1]}/>
+                        <path fill={this.colorScale[0]} d={[
                                                 "M", this.state.start.x, this.state.start.y,
                                                 "A", opts.radius, opts.radius, 0, this.state.largeArcFlag, 0, this.state.end.x, this.state.end.y,
                                                 "L", opts.cx, opts.cy,
                                                 "Z"
                                             ].join(" ")}>
                         </path>
-                        <circle r={opts.radius*(1-progrssWidth)} id="svg_2" cy={opts.radius} cx={opts.radius} fill={colorScale[4]}/>
-                        <circle r={opts.radius*(1-progrssWidth)-2} id="svg_3" cy={opts.radius} cx={opts.radius} fill={colorScale[3]}/>
+                        <circle r={opts.radius*(1-progrssWidth)} id="svg_2" cy={opts.radius} cx={opts.radius} fill={this.colorScale[4]}/>
+                        <circle r={opts.radius*(1-progrssWidth)-2} id="svg_3" cy={opts.radius} cx={opts.radius} fill={this.colorScale[3]}/>
                         <path d={((x, y, size)=>{
                             var startCord = this.polarToCartesian(x, y, size, 90);
                             var endCord = this.polarToCartesian(x, y, size, 270);
@@ -162,12 +162,12 @@ class PlayAudio extends Component {
                                 "L", x, y,
                                 "Z"
                             ].join(" ");
-                        })(opts.radius, opts.radius, opts.radius*(1-progrssWidth)-2)} fill={'#ffc7c7'} />
+                        })(opts.radius, opts.radius, opts.radius*(1-progrssWidth)-2)} fill={this.colorScale[2]} />
                         {this.state.playing
                             ?this.state.simpleMode
-                                ?this.getPauseSection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4, [colorScale[2],colorScale[0]])
-                                :this.getProgressSection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4, [colorScale[2],colorScale[0]])
-                            :this.getPlaySection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4, [colorScale[2],colorScale[0]])
+                                ?this.getPauseSection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4)
+                                :this.getProgressSection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4)
+                            :this.getPlaySection({x:(opts.radius-opts.radius*(1-progrssWidth))+2, y:0}, opts.radius*(1-progrssWidth)*2-4)
                         }
                     </g>
                 </svg>
