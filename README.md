@@ -1,8 +1,8 @@
-<h1 align='center'>
+<h1 align='left'>
   React Simple Audio Player
 </h1>
 
-<p align='center'>
+<p align='left'>
   A React component with graphics for playing audio files</a>
 </p>
 
@@ -37,3 +37,30 @@ Prop | Description | Default
 `width` | Set the width and height (height is equal to width) of the player | `60px`
 `simpleMode` | Set to `true` disable seconds counter, automatically `true` with width less then `45px` | `false`
 `colorScale` | Pass array of 5 colors for theme personalisation | scaled red shades (see demo)
+
+
+### Changing color theme example
+```js
+import React, { Component } from 'react'
+import PlayAudio from 'react-simple-audio-player'
+import chroma from "chroma-js"
+
+const colorScale = chroma
+    .scale([
+        '#0199CB',
+        '#ffffff',
+    ])
+    .mode('lch')
+    .colors(5)
+
+class App extends Component {
+    render () {
+        return <PlayAudio url={'http://www.noiseaddicts.com/samples_1w72b820/4186.mp3'} colorScale={colorScale} />
+    }
+}
+export default App
+```
+
+Result:
+
+![Demo](demo2.jpg)
