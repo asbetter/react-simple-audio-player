@@ -2562,12 +2562,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var opts = {
-    cx: 30,
-    cy: 30,
-    radius: 30,
-    start_angle: 0
-};
+var radius = 300;
 
 var initProgress = {
     loaded: 0,
@@ -2576,7 +2571,8 @@ var initProgress = {
     playedSeconds: 0
 };
 
-var progrssWidth = 0.3;
+var centerWidth = 0.75;
+var border = 0.1 * radius;
 
 var PlayAudio = function (_Component) {
     _inherits(PlayAudio, _Component);
@@ -2587,52 +2583,81 @@ var PlayAudio = function (_Component) {
         var _this = _possibleConstructorReturn(this, (PlayAudio.__proto__ || Object.getPrototypeOf(PlayAudio)).call(this, props));
 
         _this.state = {
-            start: _this.polarToCartesian(opts.cx, opts.cy, opts.radius, 0),
-            end: _this.polarToCartesian(opts.cx, opts.cy, opts.radius, opts.start_angle),
-            largeArcFlag: 0,
+            playProgressAngle: 0,
+            seekSearchArcAngle: 0,
             playing: false,
-            duration: 0,
-            started: false,
             progress: initProgress,
             simpleMode: _this.props.simpleMode ? _this.props.simpleMode : _this.props.width < 45 ? true : false,
-            width: _this.props.width ? _this.props.width : 60
+            width: _this.props.width ? _this.props.width : 60,
+            showPauseOnHover: false
         };
 
-        _this.handleClick = _this.handleClick.bind(_this);
+        _this.player = _react2.default.createRef();
+
+        _this.handlePauseOnClick = _this.handlePauseOnClick.bind(_this);
         _this.handleOnProgress = _this.handleOnProgress.bind(_this);
-        _this.handleOnDuration = _this.handleOnDuration.bind(_this);
         _this.handleOnEnded = _this.handleOnEnded.bind(_this);
+        _this.handleOnSeekChange = _this.handleOnSeekChange.bind(_this);
+        _this.handleOnSeekSearch = _this.handleOnSeekSearch.bind(_this);
+        _this.handleRemoveSeekSearch = _this.handleRemoveSeekSearch.bind(_this);
+        _this.handleShowPauseButton = _this.handleShowPauseButton.bind(_this);
+        _this.handleHidePauseButton = _this.handleHidePauseButton.bind(_this);
 
         _this.colorScale = _this.props.colorScale ? _this.props.colorScale : ['#980000', '#fa0000', '#ffc7c7', '#ffe1e1', '#ffffff'];
         return _this;
     }
 
     _createClass(PlayAudio, [{
-        key: 'handleOnDuration',
-        value: function handleOnDuration(data) {
-            this.setState({ duration: data });
-        }
-    }, {
         key: 'handleOnProgress',
         value: function handleOnProgress(data) {
-            var newStart = this.polarToCartesian(opts.cx, opts.cy, opts.radius, data.played * 360);
-            var newLargeArcFlag = data.played * 360 - opts.start_angle <= 180 ? "0" : "1";
-
-            this.setState(function (prevState, props) {
-                if (prevState.progress.played < data.played && prevState.started == true) return { progress: data, start: newStart, largeArcFlag: newLargeArcFlag };
-            });
+            this.setState({ playProgressAngle: data.played * 360, progress: data });
         }
     }, {
-        key: 'handleClick',
-        value: function handleClick() {
-            var playing = this.state.playing;
-            this.setState({ playing: !playing, started: true });
+        key: 'handlePauseOnClick',
+        value: function handlePauseOnClick() {
+            this.setState(function (prevState) {
+                return { playing: !prevState.playing };
+            });
         }
     }, {
         key: 'handleOnEnded',
         value: function handleOnEnded() {
-            var newStart = this.polarToCartesian(opts.cx, opts.cy, opts.radius, 0);
-            this.setState({ progress: initProgress, start: newStart, largeArcFlag: 0, playing: false, started: false });
+            this.setState({ progress: initProgress, playProgressAngle: 0, playing: false });
+        }
+    }, {
+        key: 'handleOnSeekSearch',
+        value: function handleOnSeekSearch(data) {
+            var angle = this.getSeekAngel(data);
+            this.setState({ seekSearchArcAngle: angle });
+        }
+    }, {
+        key: 'getSeekAngel',
+        value: function getSeekAngel(data) {
+            var elemCord = data.target.getBoundingClientRect();
+            var center = this.state.width / 2;
+            var svgX = data.clientX - elemCord.x - center;
+            var svgY = center - data.clientY + elemCord.y;
+            var r = Math.sqrt(Math.pow(svgX, 2) + Math.pow(svgY, 2));
+
+            var angle = svgY < 0 ? radiansToDegrees(Math.acos(svgX / r)) + 90 : svgX < 0 ? radiansToDegrees(Math.asin(svgY / r)) + 270 : radiansToDegrees(Math.asin(svgX / r));
+
+            return angle;
+
+            function radiansToDegrees(angleInRadians) {
+                return angleInRadians * 180 / Math.PI;
+            }
+        }
+    }, {
+        key: 'handleRemoveSeekSearch',
+        value: function handleRemoveSeekSearch() {
+            this.setState({ seekSearchArcAngle: 0 });
+        }
+    }, {
+        key: 'handleOnSeekChange',
+        value: function handleOnSeekChange(data) {
+            var angle = this.getSeekAngel(data);
+            this.player.current.seekTo(angle / 360);
+            this.setState({ playProgressAngle: angle });
         }
     }, {
         key: 'polarToCartesian',
@@ -2645,37 +2670,51 @@ var PlayAudio = function (_Component) {
             };
         }
     }, {
+        key: 'handleShowPauseButton',
+        value: function handleShowPauseButton() {
+            this.setState({ showPauseOnHover: true });
+        }
+    }, {
+        key: 'handleHidePauseButton',
+        value: function handleHidePauseButton() {
+            this.setState({ showPauseOnHover: false });
+        }
+    }, {
         key: 'getPlaySection',
         value: function getPlaySection(position, width) {
             var _this2 = this;
 
             return _react2.default.createElement(
                 'svg',
-                { x: position.x, y: position.y, width: width, viewBox: "0 0 " + opts.radius * 2 + " " + opts.radius * 2, xmlns: 'http://www.w3.org/2000/svg' },
+                { x: position.x, y: position.y, width: width, viewBox: '0 0 ' + radius * 2 + ' ' + radius * 2, xmlns: 'http://www.w3.org/2000/svg' },
                 _react2.default.createElement(
                     'g',
                     null,
-                    _react2.default.createElement('polygon', { style: { display: this.state.playing ? 'none' : true }, points: function (x, y, size) {
-                            var cord1 = _this2.polarToCartesian(x, y, size, 90);
-                            var cord2 = _this2.polarToCartesian(x, y, size, 210);
-                            var cord3 = _this2.polarToCartesian(x, y, size, 330);
+                    _react2.default.createElement('polygon', { style: { display: this.state.playing ? 'none' : true }, points: function (size) {
+                            var cord1 = _this2.polarToCartesian(radius, radius, size, 90);
+                            var cord2 = _this2.polarToCartesian(radius, radius, size, 210);
+                            var cord3 = _this2.polarToCartesian(radius, radius, size, 330);
 
                             return [cord1.x, cord1.y, cord2.x, cord2.y, cord3.x, cord3.y].join(" ");
-                        }(opts.radius, opts.radius, 18), fill: this.colorScale[0] })
+                        }(radius * 3 / 5), fill: this.colorScale[0] })
                 )
             );
         }
     }, {
         key: 'getPauseSection',
         value: function getPauseSection(position, width) {
+
+            var elemHeight = radius;
+            var elemWidth = Math.floor(radius / 4);
+            var space = Math.floor(radius / 8);
             return _react2.default.createElement(
                 'svg',
-                { x: position.x, y: position.y, width: width, viewBox: "0 0 " + opts.radius * 2 + " " + opts.radius * 2, xmlns: 'http://www.w3.org/2000/svg' },
+                { x: position.x, y: position.y, width: width, viewBox: "0 0 " + radius * 2 + " " + radius * 2, xmlns: 'http://www.w3.org/2000/svg' },
                 _react2.default.createElement(
                     'g',
                     null,
-                    this.getRectangle(19, 15, 7, 30, this.colorScale[0]),
-                    this.getRectangle(34, 15, 7, 30, this.colorScale[0])
+                    this.getRectangle(radius - elemWidth - space, elemHeight / 2, elemWidth, elemHeight, this.colorScale[0]),
+                    this.getRectangle(radius + space, elemHeight / 2, elemWidth, elemHeight, this.colorScale[0])
                 )
             );
         }
@@ -2689,16 +2728,16 @@ var PlayAudio = function (_Component) {
         value: function getProgressSection(position, width) {
             return _react2.default.createElement(
                 'svg',
-                { x: position.x, y: position.y, width: width, viewBox: "0 0 " + opts.radius * 2 + " " + opts.radius * 2, xmlns: 'http://www.w3.org/2000/svg' },
+                { x: position.x, y: position.y, width: width, viewBox: "0 0 " + radius * 2 + " " + radius * 2, xmlns: 'http://www.w3.org/2000/svg' },
                 _react2.default.createElement(
                     'g',
                     null,
                     _react2.default.createElement(
                         'text',
-                        { style: { display: this.state.playing ? true : 'none' }, y: opts.radius + 4, transform: 'translate(30)' },
+                        { style: { display: this.state.playing ? true : 'none' }, y: radius * 1.20, transform: "translate(" + radius + ")" },
                         _react2.default.createElement(
                             'tspan',
-                            { fill: this.colorScale[0], style: { fontSize: "12pt", fontFamily: "Verdana" }, x: '0', textAnchor: 'middle' },
+                            { fill: this.colorScale[0], style: { fontSize: radius / 2, lineHeight: radius / 2, fontFamily: "Verdana" }, x: '0', textAnchor: 'middle' },
                             this.formatTime(this.state.progress.playedSeconds)
                         )
                     )
@@ -2715,39 +2754,71 @@ var PlayAudio = function (_Component) {
             return m + ':' + s;
         }
     }, {
+        key: 'ref',
+        value: function ref(player) {
+            this.player = player;
+        }
+    }, {
+        key: 'getCircle',
+        value: function getCircle(x, y, r, color) {
+            return _react2.default.createElement('circle', { r: r, cy: x, cx: y, fill: color });
+        }
+    }, {
+        key: 'getProgressArc',
+        value: function getProgressArc(x, y, r, color, startAngle, endAngle) {
+
+            var startCord = this.polarToCartesian(x, y, r, startAngle);
+            var endCord = this.polarToCartesian(x, y, r, endAngle);
+            var playProgressArcFlag = endAngle < 180 ? 0 : 1;
+
+            return _react2.default.createElement('path', { fill: color, d: ["M", endCord.x, endCord.y, "A", r, r, 0, playProgressArcFlag, 0, startCord.x, startCord.y, "L", x, y, "Z"].join(" ") });
+        }
+    }, {
         key: 'render',
         value: function render() {
-            var _this3 = this;
-
             return _react2.default.createElement(
                 'div',
                 null,
                 _react2.default.createElement(
                     'svg',
-                    { onClick: this.handleClick, width: this.state.width, height: this.state.width, style: { textAlign: "center", verticalAlign: "center", cursor: this.state.playing ? "progress" : "pointer" }, viewBox: "0 0 " + opts.radius * 2 + " " + opts.radius * 2,
+                    { width: this.state.width, height: this.state.width, style: { textAlign: "center", verticalAlign: "center", cursor: "pointer" }, viewBox: "0 0 " + radius * 2 + " " + radius * 2,
                         xmlns: 'http://www.w3.org/2000/svg' },
                     _react2.default.createElement(
                         'g',
                         null,
-                        _react2.default.createElement('circle', { r: opts.radius, id: 'svg_1', cy: opts.radius, cx: opts.radius, fill: this.colorScale[1] }),
-                        _react2.default.createElement('path', { fill: this.colorScale[0], d: ["M", this.state.start.x, this.state.start.y, "A", opts.radius, opts.radius, 0, this.state.largeArcFlag, 0, this.state.end.x, this.state.end.y, "L", opts.cx, opts.cy, "Z"].join(" ") }),
-                        _react2.default.createElement('circle', { r: opts.radius * (1 - progrssWidth), id: 'svg_2', cy: opts.radius, cx: opts.radius, fill: this.colorScale[4] }),
-                        _react2.default.createElement('circle', { r: opts.radius * (1 - progrssWidth) - 2, id: 'svg_3', cy: opts.radius, cx: opts.radius, fill: this.colorScale[3] }),
-                        _react2.default.createElement('path', { d: function (x, y, size) {
-                                var startCord = _this3.polarToCartesian(x, y, size, 90);
-                                var endCord = _this3.polarToCartesian(x, y, size, 270);
-                                return ["M", startCord.x, startCord.y, "A", size, size, 0, _this3.state.largeArcFlag, 0, endCord.x, endCord.y, "L", x, y, "Z"].join(" ");
-                            }(opts.radius, opts.radius, opts.radius * (1 - progrssWidth) - 2), fill: this.colorScale[2] }),
-                        this.state.playing ? this.state.simpleMode ? this.getPauseSection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4) : this.getProgressSection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4) : this.getPlaySection({ x: opts.radius - opts.radius * (1 - progrssWidth) + 2, y: 0 }, opts.radius * (1 - progrssWidth) * 2 - 4)
+                        this.getCircle(radius, radius, radius, this.colorScale[1]),
+                        this.state.progress.played === 0 ? null : this.getProgressArc(radius, radius, radius, this.colorScale[0], 0, this.state.playProgressAngle)
+                    ),
+                    _react2.default.createElement(
+                        'g',
+                        { fillOpacity: '0', onClick: this.handleOnSeekChange, onMouseLeave: this.handleRemoveSeekSearch, onMouseMove: this.handleOnSeekSearch },
+                        this.getCircle(radius, radius, radius, null)
+                    ),
+                    _react2.default.createElement(
+                        'g',
+                        null,
+                        this.getCircle(radius, radius, radius * centerWidth, this.colorScale[4])
+                    ),
+                    _react2.default.createElement(
+                        'g',
+                        { fillOpacity: '0.5' },
+                        this.getProgressArc(radius, radius, radius * centerWidth, this.colorScale[0], 0, this.state.seekSearchArcAngle)
+                    ),
+                    _react2.default.createElement(
+                        'g',
+                        { onClick: this.handlePauseOnClick, onMouseOver: this.handleShowPauseButton, onMouseLeave: this.handleHidePauseButton },
+                        this.getCircle(radius, radius, radius * centerWidth - border, this.colorScale[3]),
+                        this.getProgressArc(radius, radius, radius * centerWidth - border, this.colorScale[2], 90, 270),
+                        this.state.playing ? this.state.simpleMode || this.state.showPauseOnHover || this.state.progress.played === 0 ? this.getPauseSection({ x: radius - radius * centerWidth + border, y: 0 }, (radius * centerWidth - border) * 2) : this.getProgressSection({ x: radius - radius * centerWidth + border, y: 0 }, (radius * centerWidth - border) * 2) : this.getPlaySection({ x: radius - radius * centerWidth + border, y: 0 }, (radius * centerWidth - border) * 2)
                     )
                 ),
                 _react2.default.createElement(_reactPlayer2.default, {
+                    ref: this.player,
                     style: { display: "none" },
                     progressInterval: 1000,
                     onProgress: this.handleOnProgress,
                     url: this.props.url,
                     playing: this.state.playing,
-                    onDuration: this.handleOnDuration,
                     onEnded: this.handleOnEnded
                 })
             );
