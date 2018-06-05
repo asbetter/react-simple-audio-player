@@ -6,11 +6,17 @@
   "scripts": {
     "start": "webpack --watch",
     "build": "webpack",
+    "lint": "standard --verbose | snazzy",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "standard": {
+    "ignore": [
+      "/build/"
+    ]
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/asbetter/react-simple-audio-player.git"
+    "url": "https://github.com/asbetter/react-simple-audio-player.git"
   },
   "keywords": [
     "react",
@@ -18,18 +24,16 @@
     "player"
   ],
   "author": "annavane",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/asbetter/react-simple-audio-player/issues"
   },
   "homepage": "https://github.com/asbetter/react-simple-audio-player#readme",
   "dependencies": {
-    "react": "^16.3.2",
-    "react-player": "^1.5.0",
-    "webpack": "^2.6.1"
+    "react-player": "^1.5.0"
   },
   "peerDependencies": {
-    "react": "^16.3.2"
+    "react": "*"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -37,6 +41,15 @@
     "babel-loader": "^7.0.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.5.1"
+    "babel-preset-env": "^1.5.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-config-standard-jsx": "^5.0.0",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-react": "^7.9.1",
+    "eslint-plugin-standard": "^3.1.0",
+    "react": "^16.4.0",
+    "snazzy": "^7.1.1",
+    "standard": "^11.0.1",
+    "webpack": "^2.6.1"
   }
 }
