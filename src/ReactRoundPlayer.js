@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ReactPlayer from 'react-player'
 
-const radius = 300
+const radius = 30
 
 const initProgress = {
   loaded: 0,
@@ -13,7 +13,7 @@ const initProgress = {
 const centerWidth = 0.75
 const border = 0.1 * radius
 
-export default class PlayAudio extends Component {
+export default class ReactRoundPlayer extends Component {
   constructor (props) {
     super(props)
 
@@ -209,7 +209,7 @@ export default class PlayAudio extends Component {
             : this.getProgressArc(radius, radius, radius, this.colorScale[0], 0, this.state.playProgressAngle)
           }
         </g>
-        <g fillOpacity='0' onClick={this.handleOnSeekChange} onMouseLeave={this.handleRemoveSeekSearch}
+        <g fillOpacity='0' onClick={this.handleOnSeekChange} className={'seek-change'} onMouseLeave={this.handleRemoveSeekSearch}
           onMouseMove={this.handleOnSeekSearch}>
           {this.getCircle(radius, radius, radius, null)}
         </g>
@@ -219,7 +219,7 @@ export default class PlayAudio extends Component {
         <g fillOpacity='0.5'>
           {this.getProgressArc(radius, radius, radius * centerWidth, this.colorScale[0], 0, this.state.seekSearchArcAngle)}
         </g>
-        <g onClick={this.handlePauseOnClick} onMouseOver={this.handleShowPauseButton}
+        <g onClick={this.handlePauseOnClick} className={'pause-or-play'} onMouseOver={this.handleShowPauseButton}
           onMouseLeave={this.handleHidePauseButton}>
           {this.getCircle(radius, radius, radius * centerWidth - border, this.colorScale[3])}
           {this.getProgressArc(radius, radius, radius * centerWidth - border, this.colorScale[2], 90, 270)}

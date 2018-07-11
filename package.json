@@ -1,13 +1,13 @@
 {
   "name": "react-simple-audio-player",
   "version": "2.0.0",
-  "description": "React component for playing audio files.",
-  "main": "build/index.js",
+  "description": "React visual component for playing audio files. Round player with play, stop and seek functionalities",
+  "main": "build/ReactRoundPlayer.js",
   "scripts": {
     "start": "webpack --watch",
     "build": "webpack",
     "lint": "standard --verbose | snazzy",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "standard": {
     "ignore": [
@@ -21,7 +21,9 @@
   "keywords": [
     "react",
     "audio",
-    "player"
+    "player",
+    "react-component",
+    "audio button"
   ],
   "author": "annavane",
   "license": "MIT",
@@ -38,16 +40,23 @@
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
+    "babel-jest": "^23.0.1",
     "babel-loader": "^7.0.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.5.1",
+    "babel-preset-react": "^6.24.1",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-config-standard-jsx": "^5.0.0",
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-react": "^7.9.1",
     "eslint-plugin-standard": "^3.1.0",
+    "jest": "^23.1.0",
     "react": "^16.4.0",
+    "react-dom": "^16.4.1",
+    "react-test-renderer": "^16.4.0",
     "snazzy": "^7.1.1",
     "standard": "^11.0.1",
     "webpack": "^2.6.1"

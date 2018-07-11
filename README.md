@@ -35,7 +35,7 @@ Prop | Description | Default
 ---- | ----------- | -------
 `url` | The url of an audio to play
 `width` | Set the width and height (height is equal to width) of the player | `60px`
-`simpleMode` | Set to `true` disable seconds counter, automatically `true` with width less then `45px` | `false`
+`simpleMode` | Set to `true` disable seconds counter, automatically `true` with width less than `45px` | `false`
 `colorScale` | Pass array of 5 colors for theme personalisation | scaled red shades (see demo)
 
 

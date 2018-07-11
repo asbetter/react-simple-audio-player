@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Player renders correctly renders correctly 1`] = `
+<div>
+  <svg
+    height={60}
+    style={
+      Object {
+        "cursor": "pointer",
+        "textAlign": "center",
+        "verticalAlign": "center",
+      }
+    }
+    viewBox="0 0 60 60"
+    width={60}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g>
+      <circle
+        cx={30}
+        cy={30}
+        fill="#fa0000"
+        r={30}
+      />
+    </g>
+    <g
+      className="seek-change"
+      fillOpacity="0"
+      onClick={[Function]}
+      onMouseLeave={[Function]}
+      onMouseMove={[Function]}
+    >
+      <circle
+        cx={30}
+        cy={30}
+        fill={null}
+        r={30}
+      />
+    </g>
+    <g>
+      <circle
+        cx={30}
+        cy={30}
+        fill="#ffffff"
+        r={22.5}
+      />
+    </g>
+    <g
+      fillOpacity="0.5"
+    >
+      <path
+        d="M 30 7.5 A 22.5 22.5 0 0 0 30 7.5 L 30 30 Z"
+        fill="#980000"
+      />
+    </g>
+    <g
+      className="pause-or-play"
+      onClick={[Function]}
+      onMouseLeave={[Function]}
+      onMouseOver={[Function]}
+    >
+      <circle
+        cx={30}
+        cy={30}
+        fill="#ffe1e1"
+        r={19.5}
+      />
+      <path
+        d="M 10.5 30.000000000000004 A 19.5 19.5 0 1 0 49.5 30 L 30 30 Z"
+        fill="#ffc7c7"
+      />
+      <svg
+        viewBox="0 0 60 60"
+        width={39}
+        x={10.5}
+        xmlns="http://www.w3.org/2000/svg"
+        y={0}
+      >
+        <g>
+          <polygon
+            fill="#980000"
+            points="48 30 21.000000000000004 45.588457268119896 20.999999999999993 14.411542731880107"
+            style={
+              Object {
+                "display": true,
+              }
+            }
+          />
+        </g>
+      </svg>
+    </g>
+  </svg>
+  <ReactPlayer
+    onEnded={[Function]}
+    onProgress={[Function]}
+    playing={false}
+    progressInterval={1000}
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+    url="https://storage.googleapis.com/media-session/elephants-dream/the-wires.mp3"
+  />
+</div>
+`;

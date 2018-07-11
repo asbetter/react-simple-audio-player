@@ -1,9 +1,9 @@
 var path = require('path')
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/ReactRoundPlayer.js',
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: 'index.js',
+    filename: 'ReactRoundPlayer.js',
     libraryTarget: 'commonjs2'
   },
   module: {
