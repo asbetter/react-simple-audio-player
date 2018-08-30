@@ -1,12 +1,14 @@
 import React from 'react'
 import ReactRoundPlayer from '../src/ReactRoundPlayer'
-import Enzyme, {mount} from 'enzyme'
+import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import renderer from 'react-test-renderer'
-Enzyme.configure({ adapter: new Adapter() });
+
+let { describe, it, jest, expect } = global
+
+Enzyme.configure({ adapter: new Adapter() })
 
 jest.mock('react-player', () => ('ReactPlayer'))
-  
 
 describe('ReactRoundPlayer', () => {
   it('renders correctly', () => {
